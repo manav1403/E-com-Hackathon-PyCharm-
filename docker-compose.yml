@@ -1,0 +1,127 @@
+version: '3'
+services:
+  django:
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    image: 'backend:latest'
+    container_name: django
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - DB_HOST=postgresql
+      - MODE=Development-docker
+      - REDIS_HOST=redis
+    ports:
+      - 8000:8000
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - postgresql
+      - redis
+    networks:
+      - app-network
+    command:
+      - /bin/sh
+      - -c
+      - |
+        python manage.py flush --no-input
+        python manage.py makemigrations
+        python manage.py migrate
+        python manage.py runserver 0.0.0.0:8000
+  vue:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    image: 'frontend:latest'
+    container_name: vue
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - BACKEND_HOST=django
+      - CHOKIDAR_USEPOLLING=true
+    ports:
+    - 8080:8080
+    volumes:
+    - ./frontend:/app
+    - /app/node_modules
+    depends_on:
+      - django
+    networks:
+      - app-network
+    command: npm run serve
+  
+  postgresql:
+    image: 'bitnami/postgresql:latest'
+    container_name: postgresql
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - POSTGRESQL_USERNAME=$DB_USER
+      - POSTGRESQL_PASSWORD=$DB_PASSWORD
+      - POSTGRESQL_DATABASE=$DB_NAME
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $DB_USER"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - dbdata:/bitnami/postgresql
+    networks:
+      - app-network
+  
+  redis:
+    image: redis:alpine
+    container_name: redis01
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+  celery:
+    image: 'backend:latest'
+    container_name: celery
+    ports: []
+    environment:
+      - DB_HOST=postgresql
+      - MODE=Development-docker
+      - REDIS_HOST=redis
+    command: celery -A config worker -l INFO
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - django
+    networks:
+      - app-network
+
+  es:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.1.0
+    ports:
+      - "9200:9200"
+    environment:
+      # disable XPack
+      # https://www.elastic.co/guide/en/elasticsearch/reference/5.3/docker.html#_security_note
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+    healthcheck:
+      test: ["CMD-SHELL", "curl -si -XGET 'localhost:9200/_cluster/health?pretty' | grep -qE 'yellow|green'"]
+      interval: 10s
+      timeout: 60s
+      retries: 10
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+  
+  img_proxy:
+    image: willnorris/imageproxy
+    ports:
+      - "8222:8222"
+    command: ["-addr", "0.0.0.0:8222"]
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  dbdata:
