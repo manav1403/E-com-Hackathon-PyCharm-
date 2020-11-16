@@ -2,18 +2,17 @@
   body(style='overflow-x: hidden;position: relative;')
     v-app
       PageHeader(style="z-index:5")
-        v-content
-                router-view
-        PageFooter
+      v-content
+              router-view
+      PageFooter
 </template>
 
 <script>
-const PageHeader = () => import("@/components/Header.vue");
-const PageFooter = () => import("@/components/Footer.vue");
 import { instance } from '@/api/axios'
+const PageHeader = () => import('@/components/Header.vue')
+const PageFooter = () => import('@/components/Footer.vue')
 export default {
   name: 'App',
-
   components: {
     PageHeader,
     PageFooter
@@ -28,7 +27,7 @@ export default {
       document.cookie = `csrftoken = ${token}`
     })
   }
-};
+}
 </script>
 <style>
 #app {
