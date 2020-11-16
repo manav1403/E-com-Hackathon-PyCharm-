@@ -1,13 +1,21 @@
 <template lang="pug">
-  v-app
+  body(style='overflow-x: hidden;position: relative;')
+    v-app
+      PageHeader(style="z-index:5")
+      v-content
+              router-view
+      PageFooter
 </template>
 
 <script>
 import { instance } from '@/api/axios'
+const PageHeader = () => import('@/components/Header.vue')
+const PageFooter = () => import('@/components/Footer.vue')
 export default {
   name: 'App',
-
   components: {
+    PageHeader,
+    PageFooter
   },
 
   data: () => ({
@@ -21,3 +29,12 @@ export default {
   }
 }
 </script>
+<style>
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  background-color: #ffffff;
+}
+</style>
