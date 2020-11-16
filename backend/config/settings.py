@@ -147,9 +147,9 @@ MEDIA_URL = '/django_media/'
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions.
     # 'rest_framework.permissions.IsAuthenticated',
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'apiauth.authentication.SessionAuthentication',
-    )
+    # 'DEFAULT_AUTHENTICATION_CLASSES': (
+    #     'apiauth.authentication.SessionAuthentication',
+    # )
 }
 
 if not DEBUG:
