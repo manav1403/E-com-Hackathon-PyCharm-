@@ -1,5 +1,5 @@
 <template lang="pug">
-v-card.elevation-24
+v-card.elevation-2
   v-app-bar(app, clipped-right, flat, floating, style="opacity:1.0")
     v-app-bar-nav-icon.hidden-md-and-up(@click.stop="drawer = !drawer")
     v-toolbar-title.hidden-sm-and-down.white--text
@@ -13,6 +13,8 @@ v-card.elevation-24
         label,
         exact
       ) {{ link.text }}
+    v-btn(icon='')
+      v-icon mdi-cart
   v-navigation-drawer(
     v-model="drawer",
     app,
@@ -37,12 +39,11 @@ export default {
       drawer: null,
       links: [
         { text: 'Home', icon: 'mdi-home' },
-        { text: 'About', icon: 'mdi-information' },
-        { text: 'Projects', icon: 'mdi-briefcase-edit-outline' },
-        { text: 'Timeline', icon: 'mdi-timeline-text' },
-        { text: 'Blog', icon: 'mdi-forum' },
-        { text: 'Videos', icon: 'mdi-television' },
-        { text: 'Team', icon: 'mdi-human-male-male' }
+        { text: 'All Products', icon: 'mdi-shopping' },
+        { text: 'Cat1', icon: 'mdi-laptop' },
+        { text: 'Cat2', icon: 'mdi-cellphone' },
+        { text: 'Cat3', icon: 'mdi-robot' },
+        { text: 'Account', icon: 'mdi-account' }
       ]
     }
   }
